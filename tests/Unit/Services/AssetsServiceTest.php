@@ -56,9 +56,9 @@ class AssetsServiceTest extends TestCase
 
   public function testCreateNewAsset()
   {
-    $request = new AssetStoreRequest(Asset::factory()->make()->toArray());
-    $response = $this->assetsService->create($request);
+    $request = new AssetStoreRequest(Asset::factory()->make(['purchaseDate' => now()])->toArray());
 
+    $response = $this->assetsService->create($request);
 
     $this->assertInstanceOf(AssetResource::class, $response);
     $this->assertArrayHasKey('name', $response);
@@ -91,7 +91,6 @@ class AssetsServiceTest extends TestCase
     $asset = Asset::factory()->create();
 
     $response = $this->assetsService->getOne($asset->id);
-
 
     $this->assertInstanceOf(AssetResource::class, $response);
     $this->assertEquals($asset->name, $response->name);
