@@ -12,10 +12,12 @@ class AssetResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'purchase_date' => $this->purchase_date,
+            'purchaseDate' => $this->purchase_date,
             'quantity' => $this->quantity,
             'quote' => $this->quote,
-            'type' => $this->type
+            'type' => $this->type,
+            'totalInvested' => $this->total_invested,
+            'transactions' => TransactionResource::collection($this->transactions),
         ];
     }
 }
