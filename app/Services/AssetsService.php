@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Exceptions\GeneralException;
+use App\Exceptions\GeneralJsonException;
 use App\Http\Requests\Assets\AssetStoreRequest;
 use App\Http\Resources\AssetResource;
 use App\Models\Asset;
@@ -34,10 +36,7 @@ class AssetsService
     $assetExist = Asset::where(['name' => $request['name'], 'type' => $request['type']])->first();
 
     if ($assetExist) {
-      return response()->json([
-        'statusCode' => 409,
-        'message' => 'Asset already exist'
-      ], 409);
+      throw new GeneralException('Asset already exist', 409);
     }
 
     $asset = Asset::create([
@@ -51,31 +50,27 @@ class AssetsService
     return new AssetResource($asset);
   }
 
-  public function getOne(Asset $asset)
+  public function getOne($id)
   {
-    $assetExist = Asset::where(['name' => $asset['name'], 'type' => $asset['type']])->first();
+    $asset = Asset::find($id);
 
-    if (!$assetExist) {
-      return response()->json([
-        'statusCode' => 404,
-        'message' => 'Asset not found'
-      ], 404);
+    if (!$asset) {
+      throw new GeneralException('Asset not found', 404);
     }
 
-    return new AssetResource($assetExist);
+    return new AssetResource($asset);
   }
 
 
-  public function delete(Asset $asset)
+  public function delete($id)
   {
-    $assetExist = Asset::where(['name' => $asset['name'], 'type' => $asset['type']])->first();
+    $asset = Asset::find($id);
 
-    if (!$assetExist) {
-      return response()->json([
-        'statusCode' => 404,
-        'message' => 'Asset not found'
-      ], 404);
+    if (!$asset) {
+      throw new GeneralException('Asset not found', 404);
     }
+
+    $asset->delete();
 
     return response()->noContent();
   }

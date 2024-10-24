@@ -21,13 +21,13 @@ class AssetController extends Controller
         return $this->assetsService->create($request);
     }
 
-    public function show(Asset $asset)
+    public function show($id)
     {
-        return $this->assetsService->getOne($asset);
+        return $this->assetsService->getOne($id);
     }
 
-    public function destroy(Asset $asset)
+    public function destroy($id)
     {
-        return $this->assetsService->delete($asset);
+        return $this->assetsService->delete($id);
     }
 }

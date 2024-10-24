@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\AssetTypeEnum;
+use App\Exceptions\GeneralException;
 use App\Http\Requests\Assets\AssetStoreRequest;
 use App\Http\Resources\AssetResource;
 use Tests\TestCase;
@@ -9,6 +10,7 @@ use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use PhpParser\Node\Stmt\TryCatch;
 
 class AssetsServiceTest extends TestCase
 {
@@ -69,20 +71,27 @@ class AssetsServiceTest extends TestCase
 
   public function testCreateReturnsErrorIfAssetAlreadyExist()
   {
-    Asset::factory()->create(['name' => 'Test Asset', 'type' => AssetTypeEnum::ACTION]);
+    $anExceptionWasThrown = false;
+    try {
+      $asset = Asset::factory()->create(['name' => 'Test Asset', 'type' => AssetTypeEnum::ACTION]);
+      $request = new AssetStoreRequest(Asset::factory()->make(['name' => 'Test Asset', 'type' => AssetTypeEnum::ACTION])->toArray());
 
-    $request = new AssetStoreRequest(Asset::factory()->make(['name' => 'Test Asset', 'type' => AssetTypeEnum::ACTION])->toArray());
-    $response = $this->assetsService->create($request);
+      $this->assetsService->create($request);
+    } catch (Exception $e) {
+      $anExceptionWasThrown = true;
 
-    $this->assertEquals(409, $response->original['statusCode']);
-    $this->assertEquals('Asset already exist', $response->original['message']);
+      $this->assertEquals(409, $e->getCode());
+      $this->assertEquals('Asset already exist', $e->getMessage());
+    }
+
+    $this->assertTrue($anExceptionWasThrown);
   }
 
   public function testGetOneReturnsAsset()
   {
     $asset = Asset::factory()->create();
 
-    $response = $this->assetsService->getOne($asset);
+    $response = $this->assetsService->getOne($asset->id);
 
 
     $this->assertInstanceOf(AssetResource::class, $response);
@@ -95,26 +104,47 @@ class AssetsServiceTest extends TestCase
 
   public function testGetOneReturnsErrorIfAssetNotFound()
   {
-    $response = $this->assetsService->getOne(new Asset());
+    $anExceptionWasThrown = false;
+    try {
+      $asset = Asset::factory()->create();
+      $asset->delete();
 
-    $this->assertEquals(404, $response->original['statusCode']);
-    $this->assertEquals('Asset not found', $response->original['message']);
+      $this->assetsService->getOne($asset->id);
+    } catch (Exception $e) {
+      $anExceptionWasThrown = true;
+
+      $this->assertEquals(404, $e->getCode());
+      $this->assertEquals('Asset not found', $e->getMessage());
+    }
+
+    $this->assertTrue($anExceptionWasThrown);
   }
 
   public function testDeleteDeletesAsset()
   {
     $asset = Asset::factory()->create();
 
-    $this->assetsService->delete($asset);
+    $response = $this->assetsService->delete($asset->id);
 
-    $this->assertNull(Asset::where('name', $asset->name)->where('type', $asset->type)->where('deleted_at', '!=', null)->first());
+    $this->assertEquals(204, $response->status());
+    $this->assertNull(Asset::find($asset->id));
   }
 
   public function testDeleteReturnsErrorIfAssetNotFound()
   {
-    $response = $this->assetsService->delete(new Asset());
+    $anExceptionWasThrown = false;
+    try {
+      $asset = Asset::factory()->create();
+      $asset->delete();
 
-    $this->assertEquals(404, $response->original['statusCode']);
-    $this->assertEquals('Asset not found', $response->original['message']);
+      $this->assetsService->delete($asset->id);
+    } catch (Exception $e) {
+      $anExceptionWasThrown = true;
+
+      $this->assertEquals(404, $e->getCode());
+      $this->assertEquals('Asset not found', $e->getMessage());
+    }
+
+    $this->assertTrue($anExceptionWasThrown);
   }
 }
