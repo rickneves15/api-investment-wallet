@@ -18,7 +18,7 @@ class AssetController extends Controller
 
     public function store(AssetStoreRequest $request)
     {
-        return $this->assetsService->store($request);
+        return $this->assetsService->create($request);
     }
 
     public function show(Asset $asset)
