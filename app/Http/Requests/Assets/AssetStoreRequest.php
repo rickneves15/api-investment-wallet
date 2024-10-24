@@ -20,9 +20,9 @@ class AssetStoreRequest extends FormRequest
     {
         return [
             'name' => ['required'],
-            'purchase_date' => ['required', 'date'],
-            'quantity' => ['required', 'integer'],
-            'quote' => ['required', 'numeric'],
+            'purchase_date' => ['required', 'date', 'after_or_equal:today'],
+            'quantity' => ['required', 'integer', 'min:1'],
+            'quote' => ['required', 'numeric', 'min:0.01',],
             'type' => ['required', Rule::enum(AssetTypeEnum::class)],
         ];
     }
