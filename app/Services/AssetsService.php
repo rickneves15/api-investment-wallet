@@ -41,7 +41,7 @@ class AssetsService
 
     $asset = Asset::create([
       'name' => $request['name'],
-      'purchase_date' => $request['purchase_date'],
+      'purchase_date' => $request['purchaseDate'],
       'quantity' => $request['quantity'],
       'quote' => $request['quote'],
       'type' => $request['type'],

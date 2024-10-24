@@ -10,7 +10,6 @@ use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use PhpParser\Node\Stmt\TryCatch;
 
 class AssetsServiceTest extends TestCase
 {
