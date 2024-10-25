@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\AssetsGroupByTypeResource;
 use App\Models\Asset;
 use App\Models\Transaction;
 use Carbon\Carbon;
@@ -36,13 +37,14 @@ class MetricsService
 
   public function getAssetsGroupedByType()
   {
-
-    return DB::table('assets')->select(
+    $data = DB::table('assets')->select(
       'type',
       DB::raw('SUM(quantity * quote) as total'),
     )
       ->groupBy('type')
       ->get()
       ->toArray();
+
+    return AssetsGroupByTypeResource::collection($data);
   }
 }
