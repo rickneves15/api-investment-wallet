@@ -23,7 +23,7 @@ class AssetsService
     $query = Asset::with('transactions')->where('deleted_at', null);
 
     if ($search) {
-      $query->where('name', 'like', '%' . $search . '%');
+      $query->where('name', 'ILIKE', '%' . $search . '%');
     }
 
     $assets = $query->paginate($perPage);
