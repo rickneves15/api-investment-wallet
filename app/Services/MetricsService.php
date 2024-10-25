@@ -45,6 +45,6 @@ class MetricsService
       ->get()
       ->toArray();
 
-    return AssetsGroupByTypeResource::collection($data);
+    return AssetsGroupByTypeResource::collection($data)->collection;
   }
 }
