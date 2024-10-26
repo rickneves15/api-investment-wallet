@@ -2,12 +2,15 @@
 
 namespace App\Services;
 
+use App\Enums\TransactionTypeEnum;
 use App\Exceptions\GeneralException;
 use App\Exceptions\GeneralJsonException;
 use App\Http\Requests\Assets\AssetStoreRequest;
 use App\Http\Resources\AssetResource;
 use App\Models\Asset;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AssetsService
 {
@@ -39,15 +42,25 @@ class AssetsService
       throw new GeneralException('Asset already exist', 409);
     }
 
-    $asset = Asset::create([
-      'name' => $request['name'],
-      'purchase_date' => $request['purchaseDate'],
-      'quantity' => $request['quantity'],
-      'quote' => $request['quote'],
-      'type' => $request['type'],
-    ]);
+    DB::transaction(function () use ($request) {
+      $asset = Asset::create([
+        'name' => $request['name'],
+        'purchase_date' => $request['purchaseDate'],
+        'quantity' => $request['quantity'],
+        'quote' => $request['quote'],
+        'type' => $request['type'],
+      ]);
 
-    return new AssetResource($asset);
+      $transaction = Transaction::create([
+        'asset_id' => $asset['id'],
+        'type' => TransactionTypeEnum::BUY,
+        'quantity' => $request['quantity'],
+        'unit_price' => $request['quote'],
+        'transaction_date' => $request['purchaseDate'] ?? now(),
+      ]);
+
+      return new AssetResource($asset);
+    });
   }
 
   public function getOne($id)
