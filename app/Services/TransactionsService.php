@@ -4,7 +4,8 @@ namespace App\Services;
 
 use App\Enums\TransactionTypeEnum;
 use App\Exceptions\GeneralException;
-use App\Http\Requests\Transactions\TransactionRequest;
+use App\Http\Requests\Transactions\BuyTransactionRequest;
+use App\Http\Requests\Transactions\SellTransactionRequest;
 use App\Http\Resources\TransactionResource;
 use App\Models\Asset;
 use App\Models\Transaction;
@@ -15,7 +16,7 @@ class TransactionsService
 
   public function __construct() {}
 
-  public function buy(TransactionRequest $request)
+  public function buy(BuyTransactionRequest $request)
   {
     $asset = Asset::find($request['assetId']);
 
@@ -29,7 +30,7 @@ class TransactionsService
         'type' => TransactionTypeEnum::BUY,
         'quantity' => $request['quantity'],
         'unit_price' => $request['unitPrice'],
-        'transaction_date' => now(),
+        'transaction_date' => $request['date'] ?? now(),
       ]);
 
       $asset->quantity += $request['quantity'];
@@ -39,7 +40,7 @@ class TransactionsService
     });
   }
 
-  public function sell(TransactionRequest $request)
+  public function sell(SellTransactionRequest $request)
   {
     $asset = Asset::find($request['assetId']);
 
@@ -57,8 +58,8 @@ class TransactionsService
         'asset_id' => $request['assetId'],
         'type' => TransactionTypeEnum::SELL,
         'quantity' => $request['quantity'],
-        'unit_price' => $request['unitPrice'],
-        'transaction_date' => now(),
+        'unit_price' => $asset->quote,
+        'transaction_date' => $request['date'] ?? now(),
       ]);
 
       $asset->quantity -= $request['quantity'];

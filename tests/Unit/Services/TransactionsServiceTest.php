@@ -4,7 +4,8 @@ namespace Tests\Unit\Services;
 
 use App\Enums\TransactionTypeEnum;
 use App\Exceptions\GeneralException;
-use App\Http\Requests\Transactions\TransactionRequest;
+use App\Http\Requests\Transactions\BuyTransactionRequest;
+use App\Http\Requests\Transactions\SellTransactionRequest;
 use App\Http\Resources\TransactionResource;
 use App\Models\Asset;
 use App\Models\Transaction;
@@ -31,11 +32,12 @@ class TransactionsServiceTest extends TestCase
 
         $transaction = Transaction::factory()->make([
             'assetId' => $asset['id'],
-            "unitPrice" => 141.02
+            "unitPrice" => 141.02,
+            "date" => now()
         ])->toArray();
 
 
-        $request = new TransactionRequest($transaction);
+        $request = new BuyTransactionRequest($transaction);
 
 
         $response = $this->transactionsService->buy($request);
@@ -55,10 +57,11 @@ class TransactionsServiceTest extends TestCase
         try {
 
             $asset = Asset::factory()->create();
-            $request = new TransactionRequest([
+            $request = new BuyTransactionRequest([
                 'assetId' => $asset['id'],
                 'quantity' => 10,
                 'unitPrice' => 100,
+                "date" => now()
             ]);
 
             $asset->delete();
@@ -83,11 +86,11 @@ class TransactionsServiceTest extends TestCase
         $transaction = Transaction::factory()->make([
             'assetId' => $asset['id'],
             'quantity' => 5,
-            "unitPrice" => 141.02
+            "date" => now()
         ])->toArray();
 
 
-        $request = new TransactionRequest($transaction);
+        $request = new SellTransactionRequest($transaction);
 
         $response = $this->transactionsService->sell($request);
 
@@ -106,10 +109,10 @@ class TransactionsServiceTest extends TestCase
         try {
 
             $asset = Asset::factory()->create();
-            $request = new TransactionRequest([
+            $request = new SellTransactionRequest([
                 'assetId' => $asset['id'],
                 'quantity' => 10,
-                'unitPrice' => 100,
+                "date" => now()
             ]);
 
             $asset->delete();
@@ -132,10 +135,10 @@ class TransactionsServiceTest extends TestCase
             $asset = Asset::factory()->create([
                 'quantity' => 5
             ]);
-            $request = new TransactionRequest([
+            $request = new SellTransactionRequest([
                 'assetId' => $asset['id'],
                 'quantity' => 10,
-                'unitPrice' => 100,
+                "date" => now()
             ]);
 
             $this->transactionsService->sell($request);

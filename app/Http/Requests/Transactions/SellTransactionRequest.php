@@ -5,7 +5,7 @@ namespace App\Http\Requests\Transactions;
 use App\Http\Requests\Helpers\ExceptionValidation;
 use Illuminate\Foundation\Http\FormRequest;
 
-class TransactionRequest extends FormRequest
+class SellTransactionRequest extends FormRequest
 {
     use ExceptionValidation;
 
@@ -18,8 +18,8 @@ class TransactionRequest extends FormRequest
     {
         return [
             'assetId' => ['required', 'exists:assets,id'],
+            'date' => ['required', 'date'],
             'quantity' => ['required', 'integer', 'min:1'],
-            'unitPrice' => ['required', 'numeric', 'min:0.01']
         ];
     }
 }
