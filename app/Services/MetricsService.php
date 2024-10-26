@@ -38,10 +38,12 @@ class MetricsService
   public function getAssetsGroupedByType()
   {
     $data = DB::table('assets')->select(
-      'type',
-      DB::raw('SUM(quantity * quote) as total'),
+      'assets.type',
+      DB::raw('SUM(assets.quantity * assets.quote) as total'),
     )
-      ->groupBy('type')
+      ->leftJoin('transactions', 'assets.id', '=', 'transactions.asset_id')
+      ->where('deleted_at', null)
+      ->groupBy('assets.type')
       ->get()
       ->toArray();
 
