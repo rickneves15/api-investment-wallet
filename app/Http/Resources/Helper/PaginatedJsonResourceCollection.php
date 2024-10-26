@@ -23,7 +23,7 @@ class PaginatedJsonResourceCollection extends AnonymousResourceCollection
       'lastPage' => $default['meta']['last_page'],
       'perPage' => $default['meta']['per_page'],
       'total' => $default['meta']['total'],
-      "previ" => $default['links']['prev'],
+      "prev" => $default['links']['prev'],
       "next" => $default['links']['next'],
     ];
     unset($default['links']);
